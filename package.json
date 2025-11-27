@@ -29,7 +29,7 @@
     "build:isml": "./node_modules/.bin/isml-linter --build",
     "fix:isml": "./node_modules/.bin/isml-linter --autofix",
     "upload": "sgmf-scripts --upload",
-    "uploadCartridge": "sgmf-scripts --uploadCartridge app_storefront_base && sgmf-scripts --uploadCartridge modules && sgmf-scripts --uploadCartridge bm_app_storefront_base",
+    "uploadCartridge": "sgmf-scripts --uploadCartridge app_custom && sgmf-scripts --uploadCartridge app_storefront_base && sgmf-scripts --uploadCartridge modules && sgmf-scripts --uploadCartridge bm_app_storefront_base",
     "watch": "sgmf-scripts --watch",
     "watch:static": "sgmf-scripts --watch static",
     "release": "node bin/Makefile release --"
@@ -83,7 +83,7 @@
     "sass": "^1.69.7",
     "sass-loader": "^13.3.2",
     "selenium-standalone": "^9.5.0",
-    "sgmf-scripts": "^3.0.0",
+    "sgmf-scripts": "^3.1.0",
     "shelljs": "^0.8.5",
     "should": "^13.2.3",
     "sinon": "^17.0.1",
