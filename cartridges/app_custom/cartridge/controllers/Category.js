@@ -1,13 +1,31 @@
 'use strict';
 
-
 var server = require('server');
 var CatalogMgr = require('dw/catalog/CatalogMgr');
 var ProductMgr = require('dw/catalog/ProductMgr');
 
+// ---------------- PRODUCT DETAIL METHOD (PDP) ----------------
+function getProductDetails(productID) {
+    var product = ProductMgr.getProduct(productID);
 
+    if (!product) {
+        return null;
+    }
+
+    // Get Product Image
+    var image = product.getImage('small', 0);
+    var imageURL = image ? image.getAbsURL().toString() : null;
+
+    return {
+        id: product.ID,
+        name: product.name,
+        price: product.priceModel.price.value,
+        image: imageURL
+    };
+}
+
+// ---------------- PRODUCT LIST METHOD (PLP) ----------------
 server.get('Products', function (req, res, next) {
-    
     var categoryID = req.querystring.categoryID;
 
     if (!categoryID) {
@@ -15,32 +33,27 @@ server.get('Products', function (req, res, next) {
         return next();
     }
 
-   
     var category = CatalogMgr.getCategory(categoryID);
-    
+
     if (!category) {
         res.json({ error: true, message: 'Category not found' });
         return next();
     }
 
-  
     var productIterator = category.getProducts().iterator();
     var products = [];
 
     while (productIterator.hasNext()) {
         var product = productIterator.next();
-
         
-        var productObj = ProductMgr.getProduct(product.ID);
+        // Reuse ProductDetail method
+        var productData = getProductDetails(product.ID);
 
-        products.push({
-            id: productObj.ID,
-            name: productObj.name,
-            price: productObj.priceModel.price.value
-        });
+        if (productData) {
+            products.push(productData);
+        }
     }
 
-    
     res.json({
         category: category.displayName || categoryID,
         category_id: categoryID,
@@ -48,6 +61,27 @@ server.get('Products', function (req, res, next) {
         products: products
     });
 
+    return next();
+});
+
+
+// ---------------- PRODUCT DETAIL ROUTE (PDP) ----------------
+server.get('ProductDetails', function (req, res, next) {
+    var productID = req.querystring.productID;
+
+    if (!productID) {
+        res.json({ error: true, message: 'productID is required' });
+        return next();
+    }
+
+    var productData = getProductDetails(productID);
+
+    if (!productData) {
+        res.json({ error: true, message: 'Product not found' });
+        return next();
+    }
+
+    res.json(productData);
     return next();
 });
 
