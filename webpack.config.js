@@ -5,24 +5,24 @@ var webpack = require('sgmf-scripts').webpack;
 var RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts');
 var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 var CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+
 var jsFiles = require('sgmf-scripts').createJsPath();
 var scssFiles = require('sgmf-scripts').createScssPath();
 
 var bootstrapPackages = {
     Alert: 'exports-loader?Alert!bootstrap/js/src/alert',
-    // Button: 'exports-loader?Button!bootstrap/js/src/button',
     Carousel: 'exports-loader?Carousel!bootstrap/js/src/carousel',
     Collapse: 'exports-loader?Collapse!bootstrap/js/src/collapse',
-    // Dropdown: 'exports-loader?Dropdown!bootstrap/js/src/dropdown',
     Modal: 'exports-loader?Modal!bootstrap/js/src/modal',
-    // Popover: 'exports-loader?Popover!bootstrap/js/src/popover',
     Scrollspy: 'exports-loader?Scrollspy!bootstrap/js/src/scrollspy',
     Tab: 'exports-loader?Tab!bootstrap/js/src/tab',
-    // Tooltip: 'exports-loader?Tooltip!bootstrap/js/src/tooltip',
     Util: 'exports-loader?Util!bootstrap/js/src/util'
 };
 
 module.exports = [
+    // ----------------------------------------------------
+    // JS files bundling (SFRA default)
+    // ----------------------------------------------------
     {
         mode: 'production',
         name: 'js',
@@ -41,9 +41,7 @@ module.exports = [
                         loader: 'babel-loader',
                         options: {
                             presets: ['@babel/env'],
-                            plugins: [
-                                '@babel/plugin-proposal-object-rest-spread'
-                            ],
+                            plugins: ['@babel/plugin-proposal-object-rest-spread'],
                             cacheDirectory: true
                         }
                     }
@@ -52,6 +50,10 @@ module.exports = [
         },
         plugins: [new webpack.ProvidePlugin(bootstrapPackages)]
     },
+
+    // ----------------------------------------------------
+    // SCSS compilation (SFRA default)
+    // ----------------------------------------------------
     {
         mode: 'none',
         name: 'scss',
@@ -74,9 +76,7 @@ module.exports = [
                         },
                         {
                             loader: 'css-loader',
-                            options: {
-                                url: false
-                            }
+                            options: { url: false }
                         },
                         {
                             loader: 'postcss-loader',
@@ -93,9 +93,7 @@ module.exports = [
                                 sassOptions: {
                                     includePaths: [
                                         path.resolve('node_modules'),
-                                        path.resolve(
-                                            'node_modules/flag-icon-css/sass'
-                                        )
+                                        path.resolve('node_modules/flag-icon-css/sass')
                                     ]
                                 }
                             }
@@ -113,6 +111,48 @@ module.exports = [
         ],
         optimization: {
             minimizer: ['...', new CssMinimizerPlugin()]
+        }
+    },
+
+    // ---------------------------------------------------------
+    // 🚀 CUSTOM REACT + TYPESCRIPT BUNDLE (PDP)
+    // ---------------------------------------------------------
+    {
+        mode: 'production',
+        name: 'react',
+        entry: {
+            reactPDP: './cartridges/app_custom/cartridge/client/default/react/pdp/index.tsx'
+        },
+        output: {
+            filename: '[name].bundle.js',
+            path: path.resolve(
+                './cartridges/app_custom/cartridge/static/default/js'
+            )
+        },
+        resolve: {
+            extensions: ['.js', '.ts', '.tsx', '.jsx']
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.(ts|tsx)$/,
+                    exclude: /node_modules/,
+                    use: 'ts-loader'
+                },
+                {
+                    test: /\.(js|jsx)$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                '@babel/preset-env',
+                                '@babel/preset-react'
+                            ]
+                        }
+                    }
+                }
+            ]
         }
     }
 ];

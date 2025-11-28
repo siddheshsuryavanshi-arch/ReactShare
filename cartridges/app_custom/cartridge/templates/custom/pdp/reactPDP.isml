@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>React PDP</title>
+</head>
+<body>
+    <!-- React mount point -->
+    <div id="pdp-root"></div>
+
+    <!-- Webpack bundle -->
+    <script src="${URLUtils.staticURL('/js/react-pdp.bundle.js')}"></script>
+</body>
+</html>
