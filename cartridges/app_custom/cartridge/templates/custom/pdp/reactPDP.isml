@@ -1,13 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>React PDP</title>
-</head>
-<body>
-    <!-- React mount point -->
-    <div id="pdp-root"></div>
+    <title>Product Details</title>
 
-    <!-- Webpack bundle -->
+    <!-- SFRA CSS + Head -->
+    <isinclude template="common/head/htmlHead"/>
+
+</head>
+<body class="page">
+
+    <!-- Header -->
+    <isinclude template="common/header"/>
+
+    <main class="container mt-4 mb-4">
+
+        <!-- React mount point -->
+        <div 
+            id="pdp-root"
+            data-productid="${pdict.productID}"
+            style="min-height:200px;"
+        ></div>
+
+    </main>
+
+    <!-- Footer -->
+    <isinclude template="common/footer"/>
+
+    <!-- Webpack React bundle -->
     <script src="${URLUtils.staticURL('/js/react-pdp.bundle.js')}"></script>
+
 </body>
 </html>
