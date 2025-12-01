@@ -2,12 +2,16 @@
 
 var server = require('server');
 
+/**
+ * Custom React PDP view renderer
+ * URL: PDPReact-Show?productID=xxxx
+ */
 server.get('Show', function (req, res, next) {
     var pid = req.querystring.productID;
 
     if (!pid) {
         res.setStatusCode(400);
-        res.print('Missing productID');
+        res.print('Missing required productID parameter');
         return next();
     }
 

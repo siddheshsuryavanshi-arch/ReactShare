@@ -7,16 +7,18 @@ var Logger = require('dw/system/Logger');
 server.replace('Show', function (req, res, next) {
     var pid = req.querystring.pid;
 
-    Logger.info('[ReactPDP] Redirect from Product-Show to PDPReact: {0}', pid);
+    Logger.info('[ReactPDP] Rendering React PDP for PID: {0}', pid);
 
     if (!pid) {
-        Logger.warn('[ReactPDP] Missing PID param');
         res.setStatusCode(400);
         res.print('Product ID missing');
         return next();
     }
 
-    res.redirect('PDPReact-Show', 'productID', pid);
+    // Render React template instead of native PDP
+    res.render('custom/pdp/reactPDP', {
+        productID: pid
+    });
 
     return next();
 });

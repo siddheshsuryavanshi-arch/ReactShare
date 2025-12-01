@@ -4,20 +4,15 @@
     <title>React PDP</title>
     <isinclude template="common/head/htmlHead"/>
 </head>
-<body class="page">
 
+<body class="page">
     <isinclude template="common/header"/>
 
     <main class="container mt-5 mb-5">
-        <div
-            id="pdp-root"
-            data-productid="${pdict.productID}">
-        </div>
+        <div id="pdp-root" data-productid="${pdict.productID}"></div>
     </main>
 
     <isinclude template="common/footer"/>
-
     <script src="${URLUtils.staticURL('/js/reactPDP.bundle.js')}"></script>
-
 </body>
 </html>
