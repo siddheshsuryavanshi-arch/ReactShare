@@ -1,0 +1,13 @@
+<isdecorate template="common/layout/page.isml">
+
+    <isreplace name="main">
+        <div class="container mt-5 mb-5">
+            <div id="pdp-root" data-productid="${pdict.productID}"></div>
+        </div>
+    </isreplace>
+
+    <isappend name="pageScripts">
+        <script src="${URLUtils.staticURL('/js/reactPDP.bundle.js')}"></script>
+    </isappend>
+
+</isdecorate>

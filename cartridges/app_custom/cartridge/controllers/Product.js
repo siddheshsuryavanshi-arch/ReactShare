@@ -5,20 +5,24 @@ server.extend(module.superModule);
 var Logger = require('dw/system/Logger');
 
 server.replace('Show', function (req, res, next) {
-    var pid = req.querystring.pid;
+    try {
+        var pid = req.querystring.pid;
+        if (!pid) {
+            res.setStatusCode(400);
+            res.print('Product ID missing');
+            return next();
+        }
 
-    Logger.info('[ReactPDP] Rendering React PDP for PID: {0}', pid);
+        Logger.info('[ReactPDP] Rendering React PDP for PID: {0}', pid);
 
-    if (!pid) {
-        res.setStatusCode(400);
-        res.print('Product ID missing');
-        return next();
+        res.render('custom/pdp/reactPDP', {
+            productID: pid
+        });
+    } catch (e) {
+        Logger.error('ReactPDP error: {0}', e.message);
+        res.setStatusCode(500);
+        res.print('PDP React failed');
     }
-
-    // Render React template instead of native PDP
-    res.render('custom/pdp/reactPDP', {
-        productID: pid
-    });
 
     return next();
 });
