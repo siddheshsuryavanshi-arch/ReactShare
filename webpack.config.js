@@ -115,7 +115,7 @@ module.exports = [
     },
 
     // ---------------------------------------------------------
-    // 🚀 CUSTOM REACT + TYPESCRIPT BUNDLE (PDP)
+    //  CUSTOM REACT + TYPESCRIPT BUNDLE (PDP)
     // ---------------------------------------------------------
     {
         mode: 'production',

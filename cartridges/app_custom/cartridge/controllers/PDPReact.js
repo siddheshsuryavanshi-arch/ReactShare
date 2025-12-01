@@ -2,8 +2,19 @@
 
 var server = require('server');
 
-server.get('Show', function(req, res, next) {
-    res.render('pdp/reactPDP');
+server.get('Show', function (req, res, next) {
+    var pid = req.querystring.productID;
+
+    if (!pid) {
+        res.setStatusCode(400);
+        res.print('Missing productID');
+        return next();
+    }
+
+    res.render('custom/pdp/reactPDP', {
+        productID: pid
+    });
+
     return next();
 });
 

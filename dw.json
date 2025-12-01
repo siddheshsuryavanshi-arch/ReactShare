@@ -1,0 +1,13 @@
+{
+  "hostname": "bmdp-002.dx.commercecloud.salesforce.com",
+  "username": "vikas.mahato@aretovetech.com",
+  "password": "Whistle9812@",
+  "cartridges": [
+    "app_custom",
+    "app_storefront_base",
+    "modules",
+    "bm_app_storefront_base"
+    
+  ],
+  "code-version": "version1.10"
+}
