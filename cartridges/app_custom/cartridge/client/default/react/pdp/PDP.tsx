@@ -5,7 +5,7 @@ export default function PDP() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Read product ID from DOM attribute
+  // Read product ID from DOM attribute...
   const pid = (document.getElementById("pdp-root") as HTMLElement)
       ?.dataset?.productid;
 
