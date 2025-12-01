@@ -1,11 +1,17 @@
+/*
 'use strict';
+//server → creates API routes.
+//CatalogMgr → used to get category data from Business Manager.
+//ProductMgr → used to get full product details.
 
 var server = require('server');
 var CatalogMgr = require('dw/catalog/CatalogMgr');
 var ProductMgr = require('dw/catalog/ProductMgr');
 
 // ---------------- PRODUCT DETAIL METHOD (PDP) ----------------
+//This function takes a productID and returns JSON 
 function getProductDetails(productID) {
+    //Fetch the product
     var product = ProductMgr.getProduct(productID);
 
     if (!product) {
@@ -25,21 +31,23 @@ function getProductDetails(productID) {
 }
 
 // ---------------- PRODUCT LIST METHOD (PLP) ----------------
+//Product List API (PLP Endpoint)
 server.get('Products', function (req, res, next) {
+    
     var categoryID = req.querystring.categoryID;
 
     if (!categoryID) {
         res.json({ error: true, message: 'categoryID is required' });
         return next();
     }
-
+    //Read the categoryID from the URL.
     var category = CatalogMgr.getCategory(categoryID);
 
     if (!category) {
         res.json({ error: true, message: 'Category not found' });
         return next();
     }
-
+    //Loop through all assigned products
     var productIterator = category.getProducts().iterator();
     var products = [];
 
@@ -86,3 +94,5 @@ server.get('ProductDetails', function (req, res, next) {
 });
 
 module.exports = server.exports();
+
+*/
