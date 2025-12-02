@@ -64,23 +64,39 @@ export default function PDP() {
   if (!product) return <h2>Product Not Found</h2>;
 
   // 5️⃣ Render PDP UI
-  return (
-    <div style={{ padding: "32px", fontFamily: "sans-serif" }}>
+return (
+  <div
+    style={{
+      padding: "32px",
+      fontFamily: "sans-serif",
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "40px",
+    }}
+  >
+    {/* LEFT SIDE IMAGE */}
+    <div style={{ flex: "0 0 380px" }}>
       <img
         src={product.image}
         alt={product.name}
         style={{
-          width: "300px",
+          width: "100%",
           borderRadius: "12px",
-          marginBottom: "16px",
+          objectFit: "cover",
         }}
       />
-      
-      <h1 style={{ fontSize: "28px", fontWeight: 600 }}>{product.name}</h1>
+    </div>
 
-      <p style={{ fontSize: "22px", marginTop: "16px" }}>
-        ₹ {product.price}
+    {/* RIGHT SIDE DETAILS */}
+    <div style={{ flex: 1 }}>
+      <h1 style={{ fontSize: "28px", fontWeight: 600, marginBottom: "16px" }}>
+        {product.name}
+      </h1>
+
+      <p style={{ fontSize: "22px", marginBottom: "24px" }}>
+        $ {product.price}
       </p>
     </div>
-  );
+  </div>
+);
 }
