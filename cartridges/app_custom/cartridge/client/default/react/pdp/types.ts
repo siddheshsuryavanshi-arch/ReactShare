@@ -5,7 +5,15 @@ export interface Product {
   id: string;
   name: string;
   price: number | null;
+
+  /** Single primary hero image (old fallback) */
   image: string | null;
+
+  /** Multiple gallery images */
+  images?: string[] | null;
+
+  /** Hero image defined by controller */
+  featuredImage?: string | null;
 
   shortDescription?: string | null;
   longDescription?: string | null;
@@ -45,13 +53,22 @@ export interface VariationOptions {
 }
 
 /**
- * Individual variant product record returned from controller
+ * Individual variant product returned by controller
  */
 export interface Variant {
   id: string;
   name: string;
   price: number | null;
-  image: string | null;
+
+  /** variant gallery images */
+  images?: string[] | null;
+
+  /** main image for variant */
+  featuredImage?: string | null;
+
+  /** legacy fallback */
+  image?: string | null;
+
   attributes: Record<string, string | null>;
 }
 

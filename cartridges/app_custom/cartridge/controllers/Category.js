@@ -20,7 +20,6 @@ function getVariantAttributes(variant) {
     return variantInfo;
 }
 
-
 /**
  * Helper: collect available variation options
  */
@@ -38,7 +37,6 @@ function getVariationOptions(product) {
 
     return variationOptions;
 }
-
 
 /**
  * PDP JSON API
@@ -68,10 +66,26 @@ server.get('ProductDetails', function (req, res, next) {
 
     Logger.info('[ReactPDP] API hit for PID: {0}', pid);
 
-    // Best available image
-    var img = product.getImage('large', 0) ||
-              product.getImage('medium', 0) ||
-              product.getImage('small', 0);
+    /** --------- MULTIPLE IMAGES BLOCK ----------- **/
+    var images = [];
+    try {
+        var largeImgs = product.getImages('large').toArray();
+        if (largeImgs.length) {
+            images = largeImgs.map(function (img) {
+                return img.getAbsURL().toString();
+            });
+        }
+    } catch (e) {
+        Logger.error('[ReactPDP] Could not read product images: ' + e);
+    }
+
+    /** fallback if no large images */
+    if (!images.length) {
+        var fallbackImg = product.getImage('medium', 0) || product.getImage('small', 0);
+        if (fallbackImg) {
+            images.push(fallbackImg.getAbsURL().toString());
+        }
+    }
 
     var availabilityModel = product.availabilityModel;
 
@@ -82,7 +96,11 @@ server.get('ProductDetails', function (req, res, next) {
         shortDescription: product.shortDescription ? product.shortDescription.toString() : null,
         longDescription: product.longDescription ? product.longDescription.toString() : null,
         price: product.priceModel && product.priceModel.price ? product.priceModel.price.value : null,
-        image: img ? img.getAbsURL().toString() : null,
+
+        /** 🟢 CHANGES: return multiple images */
+        images: images,
+        featuredImage: images.length ? images[0] : null,
+
         availability: availabilityModel ? availabilityModel.availabilityStatus.toString() : null,
         stock: availabilityModel && availabilityModel.inventoryRecord ? availabilityModel.inventoryRecord.ATS.value : null,
     };
@@ -123,12 +141,22 @@ server.get('ProductDetails', function (req, res, next) {
         var allVariants = product.getVariationModel().getVariants().toArray();
 
         response.variants = allVariants.map(function (v) {
-            var vImg = v.getImage('small', 0);
+
+            /** collect variant thumbnail images */
+            var vImgs = [];
+            try {
+                var vLarge = v.getImages('large').toArray();
+                vImgs = vLarge.map(function (img) {
+                    return img.getAbsURL().toString();
+                });
+            } catch (e) {}
+
             return {
                 id: v.ID,
                 name: v.name,
                 attributes: getVariantAttributes(v),
-                image: vImg ? vImg.getAbsURL().toString() : null,
+                images: vImgs,
+                featuredImage: vImgs.length ? vImgs[0] : null,
                 price: v.priceModel && v.priceModel.price ? v.priceModel.price.value : null
             };
         });
