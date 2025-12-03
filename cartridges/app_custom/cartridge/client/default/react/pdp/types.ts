@@ -53,7 +53,7 @@ export interface VariationOptions {
 }
 
 /**
- * Individual variant product returned by controller
+ * Individual variant returned by controller
  */
 export interface Variant {
   id: string;
