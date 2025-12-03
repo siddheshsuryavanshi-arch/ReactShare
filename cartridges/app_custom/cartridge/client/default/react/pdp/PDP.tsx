@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { PDPResponse } from "./types";
+import { PDPResponse, Product } from "./types";
 
 export default function PDP() {
   const [data, setData] = useState<PDPResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // read product id from DOM
   const pid = document.getElementById("pdp-root")?.dataset?.productid;
 
   useEffect(() => {
@@ -20,16 +19,11 @@ export default function PDP() {
       try {
         const url = `${window.location.origin}/on/demandware.store/Sites-RefArch-Site/default/Category-ProductDetails?pid=${pid}`;
 
-        console.log("[PDP] Fetch →", url);
-
         const res = await fetch(url);
         const json = await res.json();
 
-        console.log("[PDP] response ↓", json);
-
         if (!json || json.error || !json.product) {
           setErrorMsg(json?.message || "Product not found");
-          setData(null);
         } else {
           setData(json as PDPResponse);
         }
@@ -44,70 +38,137 @@ export default function PDP() {
     loadProduct();
   }, [pid]);
 
+  async function addToCart(pid: string) {
+    try {
+      const fd = new FormData();
+      fd.append("pid", pid);
+      fd.append("quantity", "1");
+
+      const res = await fetch(
+        "/on/demandware.store/Sites-RefArch-Site/default/Cart-AddProduct",
+        {
+          method: "POST",
+          body: fd,
+        }
+      );
+
+      const json = await res.json();
+      console.log("[CART] response ↓", json);
+
+      if (json.error) {
+        alert(json.message || "Could not add to cart");
+        return;
+      }
+
+      alert("Product added to cart!");
+    } catch (err) {
+      console.error("[CART] error:", err);
+      alert("Cart request failed");
+    }
+  }
+
   if (loading) return <h2>Loading product...</h2>;
   if (errorMsg) return <h2>{errorMsg}</h2>;
   if (!data) return <h2>Product Not Found</h2>;
 
-  const product = data.product;
+  const product: Product = data.product;
 
-  // 👉 PRICE FORMATTER IN USD
   const formattedPrice =
     product.price != null
-      ? new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        }).format(product.price)
+      ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(product.price)
       : null;
 
   return (
-    <div
-      style={{
-        padding: "32px",
-        fontFamily: "sans-serif",
-        display: "flex",
-        gap: "40px",
-        alignItems: "flex-start",
-      }}
-    >
-      {/* LEFT: IMAGE */}
-      <div style={{ flex: "0 0 360px" }}>
-        {product.image && (
-          <img
-            src={product.image}
-            alt={product.name}
-            style={{ width: "100%", borderRadius: "12px" }}
-          />
-        )}
+    <div style={{ padding: "40px", fontFamily: "sans-serif" }}>
+      <div style={{ display: "flex", gap: "40px" }}>
+        {/* IMAGE */}
+        <div style={{ flex: "0 0 360px" }}>
+          {product.image && (
+            <img
+              src={product.image}
+              alt={product.name}
+              style={{ width: "100%", borderRadius: "12px" }}
+            />
+          )}
+        </div>
+
+        {/* MAIN INFO */}
+        <div style={{ flex: 1 }}>
+          <h1 style={{ fontSize: "30px", fontWeight: 600 }}>{product.name}</h1>
+
+          {formattedPrice && (
+            <p style={{ fontSize: "22px", margin: "12px 0" }}>{formattedPrice}</p>
+          )}
+
+          {product.shortDescription && (
+            <p style={{ fontSize: "16px" }}>{product.shortDescription}</p>
+          )}
+
+          {product.longDescription && (
+            <p style={{ fontSize: "14px", opacity: 0.8, marginTop: "8px" }}>
+              {product.longDescription}
+            </p>
+          )}
+
+          {product.availability && (
+            <p style={{ marginTop: "12px" }}>
+              <b>Availability:</b> {product.availability}
+            </p>
+          )}
+
+          {product.stock != null && (
+            <p>
+              <b>Stock:</b> {product.stock}
+            </p>
+          )}
+
+          {/* ADD TO CART */}
+          <button
+            onClick={() => addToCart(product.id)}
+            style={{
+              padding: "12px 20px",
+              marginTop: "18px",
+              background: "black",
+              color: "white",
+              fontSize: "14px",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            ADD TO CART
+          </button>
+        </div>
       </div>
 
-      {/* RIGHT: DETAILS */}
-      <div style={{ flex: 1 }}>
-        <h1 style={{ fontSize: "28px", fontWeight: 600, marginBottom: "12px" }}>
-          {product.name}
-        </h1>
+      {/* SYSTEM ATTRIBUTES */}
+      {data.attributes?.system && (
+        <div style={{ marginTop: "40px" }}>
+          <h3>Product Info</h3>
+          <table style={{ borderCollapse: "collapse", width: "100%", marginTop: "12px" }}>
+            {Object.entries(data.attributes.system).map(([key, value]) => (
+              <tr key={key}>
+                <td style={{ padding: "6px 10px", fontWeight: 600 }}>{key}</td>
+                <td style={{ padding: "6px 10px" }}>{value ?? "-"}</td>
+              </tr>
+            ))}
+          </table>
+        </div>
+      )}
 
-        {formattedPrice && (
-          <p style={{ fontSize: "22px", marginBottom: "12px" }}>
-            {formattedPrice}
-          </p>
-        )}
-
-        {product.shortDescription && (
-          <p style={{ marginTop: "8px" }}>{product.shortDescription}</p>
-        )}
-
-        {product.availability && (
-          <p style={{ marginTop: "12px", fontSize: "14px" }}>
-            Availability: {product.availability}
-          </p>
-        )}
-
-        {product.stock != null && (
-          <p style={{ marginTop: "4px", fontSize: "14px" }}>
-            Stock: {product.stock}
-          </p>
-        )}
-      </div>
+      {/* CUSTOM ATTRIBUTES */}
+      {data.attributes?.custom && (
+        <div style={{ marginTop: "40px" }}>
+          <h3>Attributes</h3>
+          <table style={{ borderCollapse: "collapse", width: "100%", marginTop: "12px" }}>
+            {Object.entries(data.attributes.custom).map(([key, value]) => (
+              <tr key={key}>
+                <td style={{ padding: "6px 10px", fontWeight: 600 }}>{key}</td>
+                <td style={{ padding: "6px 10px" }}>{value ?? "-"}</td>
+              </tr>
+            ))}
+          </table>
+        </div>
+      )}
     </div>
   );
 }
